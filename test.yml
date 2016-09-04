@@ -1,0 +1,16 @@
+number: 123
+string: C:\temp\hoge\fuga
+boolean:  yes
+boolean2: on
+boolean3: true
+array:
+  - 1
+  - 2
+  - 3
+# comment
+flowstyle: 
+  {
+    str: "hoge",
+    num: 123,
+    ary: [true, false, null]
+  }
