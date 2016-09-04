@@ -1,4 +1,5 @@
 number: 123
+double: -12.3
 string: C:\temp\hoge\fuga
 boolean:  yes
 boolean2: on
