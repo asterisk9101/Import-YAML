@@ -3,8 +3,6 @@ $Lexer = $Lexer |
 Add-Member -PassThru NoteProperty at 0 |
 Add-Member -PassThru NoteProperty col 0 |
 Add-Member -PassThru NoteProperty ch "" |
-Add-Member -PassThru NoteProperty k 0 |
-Add-Member -PassThru NoteProperty lookahead @() |
 Add-Member -PassThru NoteProperty token $null |
 Add-Member -PassThru NoteProperty stream $null |
 Add-Member -PassThru ScriptMethod initialize {
