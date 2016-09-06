@@ -8,7 +8,7 @@ Add-Member -PassThru NoteProperty stream $null |
 Add-Member -PassThru ScriptMethod initialize {
     param($Path, $Encoding = [System.Text.Encoding]::Default)
     $Path = Resolve-Path $Path
-    $this.stream = New-Object System.IO.StreamReader($Path, $Encoding)
+    $this.stream = New-Object System.IO.StreamReader($Path.ProviderPath, $Encoding)
     $this.next() > $null
     $this.at = 0
     $this.col = 0
@@ -428,7 +428,7 @@ function Import-YAML {
     param($Path, $Encoding = [Text.Encoding]::Default)
     $Path = Resolve-Path $Path
     try {
-        $Lexer.initialize($Path, $Encoding)
+        $Lexer.initialize($Path.ProviderPath, $Encoding)
         $Parser.run($Lexer)
         $Lexer.stream.Close()
     } catch {
