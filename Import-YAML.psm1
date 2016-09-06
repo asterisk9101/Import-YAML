@@ -264,7 +264,8 @@ Add-Member -PassThru ScriptMethod stat_FLOW_SEQUENCE {
 } |
 Add-Member -PassThru ScriptMethod tran_STRING {
     param($token)
-    $number = 0
+    $double = New-Object System.Double
+    $datetime = New-Object System.DateTime
     switch ($token.value) {
         "true" { return $true }
         "false" { return $false }
@@ -274,8 +275,11 @@ Add-Member -PassThru ScriptMethod tran_STRING {
         "off" { return $false }
         "null" { return $null }
         "nil" { return $null }
-        {[Double]::TryParse($token.value, [ref]$number)} {
-            return $number
+        {[Double]::TryParse($token.value, [ref]$double)} {
+            return $double
+        }
+        {[Datetime]::TryParse($token.value, [ref]$datetime)} {
+            return $datetime
         }
         default { return $token.value }
     }
