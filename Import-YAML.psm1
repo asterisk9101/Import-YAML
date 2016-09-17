@@ -26,7 +26,8 @@ Add-Member -PassThru ScriptMethod tokenize {
     $ret = $ret |
     Add-Member -PassThru NoteProperty TYPE $type |
     Add-Member -PassThru NoteProperty VALUE $value |
-    Add-Member -PassThru NoteProperty INDENT $indent
+    Add-Member -PassThru NoteProperty INDENT $indent |
+    Add-Member -PassThru NoteProperty AT $this.at
     return $ret
 } |
 Add-Member -PassThru ScriptMethod next {
