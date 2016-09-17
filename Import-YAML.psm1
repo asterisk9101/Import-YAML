@@ -16,8 +16,9 @@ Add-Member -PassThru ScriptMethod initialize {
 Add-Member -PassThru ScriptMethod error {
     param($msg)
     throw @{
-        at = $this.at;
-        message = $msg;
+        at = $this.at
+        ch = $this.ch
+        message = $msg
     }
 } |
 Add-Member -PassThru ScriptMethod tokenize {
@@ -174,7 +175,10 @@ Add-Member -PassThru NoteProperty lexer $null |
 Add-Member -PassThru NoteProperty token $null |
 Add-Member -PassThru ScriptMethod error {
     param($msg)
-    throw $msg
+    throw @{
+        token = $this.token
+        message = $msg
+    }
 } |
 Add-Member -PassThru ScriptMethod consume {
     $this.token = $this.lexer.nextToken()
@@ -410,7 +414,7 @@ function hoge {
         }
         $Lexer.stream.Close()
     } catch {
-        $_
+        Write-Error $_
     } finally {
         $Lexer.stream.Close()
     }
@@ -423,7 +427,7 @@ function fuga {
         $Parser.run($Lexer)
         $Lexer.stream.Close()
     } catch {
-        $_
+        Write-Error $_
     } finally {
         $Lexer.stream.Close()
     }
@@ -437,7 +441,7 @@ function Import-YAML {
         $Parser.run($Lexer)
         $Lexer.stream.Close()
     } catch {
-        $_
+        Write-Error $_ 
     } finally {
         $Lexer.stream.Close()
     }
