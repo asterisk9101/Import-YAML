@@ -15,11 +15,9 @@ Add-Member -PassThru ScriptMethod initialize {
 } |
 Add-Member -PassThru ScriptMethod error {
     param($msg)
-    throw @{
-        at = $this.at
-        ch = $this.ch
-        message = $msg
-    }
+    $at = $this.at
+    $ch = $this.ch
+    throw "Lexer Error: $msg, at $at, ch '$ch'."
 } |
 Add-Member -PassThru ScriptMethod tokenize {
     param($type, $value, $indent)
@@ -175,10 +173,7 @@ Add-Member -PassThru NoteProperty lexer $null |
 Add-Member -PassThru NoteProperty token $null |
 Add-Member -PassThru ScriptMethod error {
     param($msg)
-    throw @{
-        token = $this.token
-        message = $msg
-    }
+    throw "Parser Error: $msg"
 } |
 Add-Member -PassThru ScriptMethod consume {
     $this.token = $this.lexer.nextToken()
@@ -225,7 +220,7 @@ Add-Member -PassThru ScriptMethod stat_FLOW {
             return $this.stat_STRING()
         }
     }
-    $this.error("invalid flow style value. $next")
+    $this.error("Invalid flow style value. $next")
 } |
 Add-Member -PassThru ScriptMethod stat_FLOW_MAPPING {
     $result = New-Object System.Collections.Hashtable
@@ -246,7 +241,7 @@ Add-Member -PassThru ScriptMethod stat_FLOW_MAPPING {
         $this.match("RBRACE")
         return $result
     }
-    $this.error("invalid mapping")
+    $this.error("Invalid mapping. Expected '}', but Found $next.")
 } |
 Add-Member -PassThru ScriptMethod stat_FLOW_SEQUENCE {
     $result = New-Object System.Collections.ArrayList
@@ -265,7 +260,7 @@ Add-Member -PassThru ScriptMethod stat_FLOW_SEQUENCE {
         $this.match("RBRACKET")
         return $result
     }
-    $this.error("invalid sequence")
+    $this.error("Invalid sequence. Expected ']', but Found $next.")
 } |
 Add-Member -PassThru ScriptMethod tran_STRING {
     param($token)
@@ -335,7 +330,7 @@ Add-Member -PassThru ScriptMethod stat_MAPPING {
             $key = $this.stat_KEY($next)
             $next = $this.token
         } else {
-            $this.error("invalid mapping. $next")
+            $this.error("Invalid mapping. Indent doesn't match. $next")
         }
     }
     $this.white()
@@ -343,7 +338,7 @@ Add-Member -PassThru ScriptMethod stat_MAPPING {
 } |
 Add-Member -PassThru ScriptMethod stat_SEQUENCE {
     param($hyphen)
-    if ($hyphen.type -ne "HYPHEN") { $this.error("invalid sequence. $hyphen") }
+    if ($hyphen.type -ne "HYPHEN") { $this.error("Invalid sequence. Expected '-' but Found $hyphen") }
     $level = $hyphen.indent
     $result = New-Object System.Collections.ArrayList
     $next = $this.token # expect list value(not hyphen)
@@ -364,7 +359,7 @@ Add-Member -PassThru ScriptMethod stat_SEQUENCE {
             # continue next loop
             $next = $this.next("HYPHEN")
         } else {
-            $this.error("invalid sequence")
+            $this.error("Invalid sequence. Indent doesn't match. $next")
         }
     }
     $this.white()
@@ -389,7 +384,7 @@ Add-Member -PassThru ScriptMethod stat_YAML {
     $this.white()
     $next = $this.token
     if ($next.type -ne "EOF") {
-        $this.error("invalid YAML. Found $next.")
+        $this.error("Invalid YAML. Expected EOF but Found $next.")
     }
     return $result
 } |
@@ -441,7 +436,7 @@ function Import-YAML {
         $Parser.run($Lexer)
         $Lexer.stream.Close()
     } catch {
-        Write-Error $_ 
+        Write-Error $_
     } finally {
         $Lexer.stream.Close()
     }
